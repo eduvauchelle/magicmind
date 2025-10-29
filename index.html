@@ -1,53 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MagicMind – Journal</title>
-<link rel="stylesheet" href="styles.css?v=4" />
-</head>
-
-<body>
-  <div id="app">
-    <!-- HEADER -->
-    <header class="toolbar">
-      <h1>MagicMind</h1>
-      <button id="newBtn" class="icon-btn">+</button>
-      <button id="insightsBtn" class="accent">Insights</button>
-    </header>
-
-    <!-- LIST -->
-    <section id="listView">
-      <p id="streak" class="streak">Current Streak: 0 days</p>
-      <ul id="entriesList">
-        <li>No entries yet. Tap + to start!</li>
-      </ul>
-    </section>
-
-    <!-- EDITOR -->
-    <section id="editorView" class="hidden">
-      <textarea id="editor" placeholder="Start writing your reflection..."></textarea>
-
-      <div class="prompts">
-        <button class="prompt-btn">What small win felt good today despite the fog?</button>
-        <button class="prompt-btn">Describe a looping thought and challenge it kindly.</button>
-        <button class="prompt-btn">How did ADHD symptoms link to your mood?</button>
-      </div>
-
-      <div class="editor-toolbar">
-        <button id="saveBtn" class="accent">Save</button>
-        <button id="cancelBtn">Cancel</button>
-      </div>
-    </section>
-
-    <!-- INSIGHTS -->
-    <section id="insightsView" class="hidden">
-      <h2>Thought Trends</h2>
-      <div id="clusters"></div>
-      <button id="backFromInsights" class="accent">Back</button>
-    </section>
-  </div>
-
-  <script src="app.js"></script>
-</body>
-</html>
+<script>
+  AppleID.auth.init({
+    clientId: 'your.services.id',  // From Apple Developer
+    scope: 'name email',
+    redirectURI: window.location.href,  // For GitHub Pages
+    usePopup: true
+  });
+</script>
