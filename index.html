@@ -5,28 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MagicMind – Journal</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Apple Sign-In JS SDK -->
-  <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 </head>
 
 <body>
-  <div id="app" class="hidden">
-    <!-- ==== HEADER ==== -->
+  <div id="app">
+    <!-- HEADER -->
     <header class="toolbar">
       <h1>MagicMind</h1>
       <button id="newBtn" class="icon-btn">+</button>
       <button id="insightsBtn" class="accent">Insights</button>
     </header>
 
-    <!-- ==== LIST ==== -->
+    <!-- LIST -->
     <section id="listView">
-      <p id="streak" class="streak"></p>
-      <ul id="entriesList"></ul>
+      <p id="streak" class="streak">Current Streak: 0 days</p>
+      <ul id="entriesList">
+        <li>No entries yet. Tap + to start!</li>
+      </ul>
     </section>
 
-    <!-- ==== EDITOR ==== -->
+    <!-- EDITOR -->
     <section id="editorView" class="hidden">
-      <textarea id="editor" placeholder="Start writing…"></textarea>
+      <textarea id="editor" placeholder="Start writing your reflection..."></textarea>
 
       <div class="prompts">
         <button class="prompt-btn">What small win felt good today despite the fog?</button>
@@ -40,19 +40,12 @@
       </div>
     </section>
 
-    <!-- ==== INSIGHTS ==== -->
+    <!-- INSIGHTS -->
     <section id="insightsView" class="hidden">
       <h2>Thought Trends</h2>
       <div id="clusters"></div>
       <button id="backFromInsights" class="accent">Back</button>
     </section>
-  </div>
-
-  <!-- ==== LOGIN ==== -->
-  <div id="loginScreen">
-    <h2>Welcome to MagicMind</h2>
-    <p>Sign in with Apple to sync across all your devices.</p>
-    <div id="appleid-signin" data-type="sign in"></div>
   </div>
 
   <script src="app.js"></script>
