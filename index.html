@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MagicMind – Journal</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Apple Sign-In JS SDK -->
+  <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+</head>
+
+<body>
+  <div id="app" class="hidden">
+    <!-- ==== HEADER ==== -->
+    <header class="toolbar">
+      <h1>MagicMind</h1>
+      <button id="newBtn" class="icon-btn">+</button>
+      <button id="insightsBtn" class="accent">Insights</button>
+    </header>
+
+    <!-- ==== LIST ==== -->
+    <section id="listView">
+      <p id="streak" class="streak"></p>
+      <ul id="entriesList"></ul>
+    </section>
+
+    <!-- ==== EDITOR ==== -->
+    <section id="editorView" class="hidden">
+      <textarea id="editor" placeholder="Start writing…"></textarea>
+
+      <div class="prompts">
+        <button class="prompt-btn">What small win felt good today despite the fog?</button>
+        <button class="prompt-btn">Describe a looping thought and challenge it kindly.</button>
+        <button class="prompt-btn">How did ADHD symptoms link to your mood?</button>
+      </div>
+
+      <div class="editor-toolbar">
+        <button id="saveBtn" class="accent">Save</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+    </section>
+
+    <!-- ==== INSIGHTS ==== -->
+    <section id="insightsView" class="hidden">
+      <h2>Thought Trends</h2>
+      <div id="clusters"></div>
+      <button id="backFromInsights" class="accent">Back</button>
+    </section>
+  </div>
+
+  <!-- ==== LOGIN ==== -->
+  <div id="loginScreen">
+    <h2>Welcome to MagicMind</h2>
+    <p>Sign in with Apple to sync across all your devices.</p>
+    <div id="appleid-signin" data-type="sign in"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

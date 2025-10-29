@@ -1,0 +1,51 @@
+/* ---- Core colors & fonts ---- */
+:root {
+  --bg: #f5f5f5;           /* off-white */
+  --dark-bg: #1e1e1e;      /* soft dark */
+  --text: #000;
+  --text-dark: #fff;
+  --accent: #d7bde2;       /* light purple */
+  --mono: "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--dark-bg);
+    --text: var(--text-dark);
+  }
+}
+
+/* ---- Global ---- */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: var(--mono); background: var(--bg); color: var(--text); line-height: 1.5; }
+.hidden { display:none !important; }
+
+/* ---- Layout ---- */
+#app, #loginScreen { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+
+/* ---- Toolbar ---- */
+.toolbar {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: .5rem 0; margin-bottom:1rem; border-bottom:1px solid #ddd;
+}
+.toolbar h1 { font-size:1.2rem; }
+.icon-btn { font-size:1.8rem; background:none; border:none; cursor:pointer; }
+.accent { background: var(--accent); color:#000; border:none; padding:.4rem .8rem; border-radius:4px; cursor:pointer; }
+
+/* ---- List ---- */
+#entriesList { list-style:none; }
+#entriesList li { padding:.8rem 0; border-bottom:1px solid #eee; cursor:pointer; }
+#entriesList li:hover { background:#eee; }
+.streak { font-weight:600; color:var(--accent); margin-bottom:.5rem; }
+
+/* ---- Editor ---- */
+#editor { width:100%; min-height:60vh; font-family:var(--mono); font-size:1rem; padding:1rem;
+          background:var(--bg); color:var(--text); border:1px solid #ccc; border-radius:4px; }
+.prompts { margin:1rem 0; display:flex; gap:.5rem; flex-wrap:wrap; }
+.prompt-btn { font-size:.85rem; background:#fff; border:1px solid #ccc; border-radius:4px; padding:.4rem .6rem; cursor:pointer; }
+.editor-toolbar { margin-top:.5rem; display:flex; gap:.5rem; }
+
+/* ---- Insights ---- */
+#clusters .cluster { margin-bottom:1.5rem; }
+#clusters h3 { color:var(--accent); margin-bottom:.3rem; }
+#clusters .entry { margin-left:1rem; font-size:.9rem; color:#666; }
