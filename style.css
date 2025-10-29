@@ -1,19 +1,20 @@
 /* -------------------------------------------------
-   iA Writer – MagicMind Edition (Gradient Version)
+   iA Writer – MagicMind (Gradient + White Editor)
    ------------------------------------------------- */
 
-/* Core colors (from screenshot gradient) */
+/* Core colors */
 :root {
-  --bg-gradient: linear-gradient(135deg, #6a00f4 0%, #a100ff 25%, #ff00ff 50%, #ff9900 100%); /* Purple-blue-pink-orange */
-  --text: #000;            /* Black text */
-  --accent: #c7a4ff;       /* Light purple buttons */
-  --editor-bg: #fff;       /* White editor */
-  --shadow: 0 4px 12px rgba(0,0,0,0.15); /* Subtle shadow */
+  --bg-gradient: linear-gradient(135deg, #6a00f4 0%, #a100ff 25%, #ff00ff 50%, #ff9900 100%);
+  --editor-bg: #ffffff;
+  --text: #000000;
+  --accent: #c7a4ff;
+  --shadow: 0 4px 12px rgba(0,0,0,0.15);
   --mono: "iA Writer Mono", "SF Mono", Menlo, Monaco, "Courier New", monospace;
 }
 
-/* Global reset */
+/* Reset & page */
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 body {
   font-family: var(--mono);
   background: var(--bg-gradient);
@@ -23,56 +24,44 @@ body {
   padding: 2rem 1rem;
   max-width: 800px;
   margin: 0 auto;
-  min-height: 100vh;
 }
 
-/* Hide unused views */
+/* Hide views */
 .hidden { display: none !important; }
 
-/* -------------------------------------------------
-   TOOLBAR – clean, top-left title, right buttons
-   ------------------------------------------------- */
+/* Toolbar */
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  font-size: 1.1rem;
-  color: #fff; /* White on gradient */
 }
 .toolbar h1 {
-  font-weight: normal;
   font-size: 1.8rem;
-  color: #000; /* Black for contrast */
+  font-weight: normal;
+  color: #000;
 }
 .icon-btn, .accent {
   background: var(--accent);
   border: none;
   font-size: 1.2rem;
-  cursor: pointer;
   padding: 0.4rem 1rem;
-  border-radius: 20px; /* Rounded */
+  border-radius: 20px;
   color: #000;
+  cursor: pointer;
   box-shadow: var(--shadow);
-  transition: transform 0.2s;
+  transition: transform .2s;
 }
 .icon-btn:hover, .accent:hover { transform: scale(1.05); }
 
-/* -------------------------------------------------
-   LIST VIEW – simple bullets
-   ------------------------------------------------- */
-#listView {
-  margin-bottom: 2rem;
-}
+/* List */
+#listView { margin-bottom: 2rem; }
 .streak {
   font-weight: 600;
   color: #000;
   margin-bottom: 1rem;
-  font-size: 1.1rem;
 }
-#entriesList {
-  list-style: none;
-}
+#entriesList { list-style: none; }
 #entriesList li {
   padding: 1rem 0;
   color: #000;
@@ -81,17 +70,13 @@ body {
 }
 #entriesList li strong {
   display: block;
-  font-size: 1.0rem;
+  font-size: 1rem;
   color: #333;
-  margin-bottom: 0.3rem;
+  margin-bottom: .3rem;
 }
 
-/* -------------------------------------------------
-   EDITOR – white box with shadow on gradient bg
-   ------------------------------------------------- */
-#editorView {
-  position: relative;
-}
+/* Editor – white box on gradient */
+#editorView { position: relative; }
 #editor {
   width: 100%;
   min-height: 20vh;
@@ -108,58 +93,50 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* -------------------------------------------------
-   PROMPTS – rounded with shadow
-   ------------------------------------------------- */
+/* Prompts */
 .prompts {
   margin: 1.5rem 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: .6rem;
 }
 .prompt-btn {
-  font-size: 0.9rem;
+  font-size: .9rem;
   background: #fff;
   border: none;
   color: #555;
-  padding: 0.6rem 1.2rem;
+  padding: .6rem 1.2rem;
   border-radius: 20px;
   cursor: pointer;
   box-shadow: var(--shadow);
-  transition: all 0.2s;
 }
 .prompt-btn:hover {
   background: var(--accent);
   color: #000;
 }
 
-/* -------------------------------------------------
-   EDITOR TOOLBAR – rounded buttons
-   ------------------------------------------------- */
+/* Editor toolbar */
 .editor-toolbar {
   margin-top: 1rem;
   display: flex;
-  gap: 0.8rem;
+  gap: .8rem;
 }
 .editor-toolbar button {
-  padding: 0.6rem 1.2rem;
+  padding: .6rem 1.2rem;
   border-radius: 20px;
   font-weight: 600;
-  box-shadow: var(--shadow);
   background: #fff;
   color: #555;
+  box-shadow: var(--shadow);
 }
 .editor-toolbar .accent {
   background: var(--accent);
   color: #000;
 }
 
-/* -------------------------------------------------
-   INSIGHTS – clean on gradient
-   ------------------------------------------------- */
+/* Insights */
 #insightsView h2 {
   margin-bottom: 1.5rem;
-  font-weight: normal;
   font-size: 1.6rem;
   color: #000;
 }
@@ -170,23 +147,7 @@ body {
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
-#clusters h3 {
-  color: var(--accent);
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-#clusters .entry {
-  margin: 0.6rem 0 0.6rem 1.2rem;
-  font-size: 0.95rem;
-  color: #444;
-}
-#clusters p[style*="italic"] {
-  color: #666;
-  font-style: italic;
-  margin-top: 0.5rem;
-}
-#backFromInsights {
-  background: #fff;
-  color: #555;
-}
+#clusters h3 { color: var(--accent); margin-bottom: .5rem; }
+#clusters .entry { margin: .6rem 0 .6rem 1.2rem; color: #444; }
+#clusters p[style*="italic"] { color: #666; font-style: italic; margin-top: .5rem; }
+#backFromInsights { background: #fff; color: #555; }
