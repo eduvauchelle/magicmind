@@ -8,7 +8,7 @@
   --text: #333;            /* Rich dark gray */
   --accent: #c7a4ff;       /* iA Writer purple */
   --focus-line: #e0e0e0;   /* Subtle line under current line */
-  --mono: "iA Writer Mono", "SF Mono", Menlo, Monaco, "Courier New", monospace;
+ --mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
 }
 
 /* Global reset */
