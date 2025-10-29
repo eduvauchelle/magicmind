@@ -1,11 +1,11 @@
-/* iA Writer Clone – MagicMind (Minimal, Typewriter Focus) */
+/* iA Writer – MagicMind (Exact Minimal Clone) */
 
 :root {
-  --bg: #f8f8f8;  /* Soft off-white paper */
-  --text: #333333; /* Dark gray for readability */
-  --accent: #8e44ad; /* Subtle purple for buttons */
-  --focus-line: #e0e0e0; /* Subtle underline for current line */
-  --mono: "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace; /* iA fallback */
+  --bg: #f8f8f8;  /* iA's soft paper white */
+  --text: #333;    /* Dark gray for eyes */
+  --accent: #8e44ad; /* Subtle purple */
+  --border: #e0e0e0; /* Light gray lines */
+  --mono: "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
   --line-height: 1.8;
 }
 
@@ -15,7 +15,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: var(--line-height);
-  font-size: 16px; /* Base for typewriter feel */
+  font-size: 16px;
   padding: 40px 20px;
   max-width: 800px;
   margin: 0 auto;
@@ -25,19 +25,19 @@ body {
 /* Hide views */
 .hidden { display: none !important; }
 
-/* Toolbar – Minimal top bar, like iA */
+/* Toolbar – iA's subtle top line */
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border);
 }
 .toolbar h1 {
   font-size: 24px;
   font-weight: normal;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 .icon-btn, .accent {
   background: none;
@@ -45,26 +45,24 @@ body {
   font-size: 18px;
   cursor: pointer;
   padding: 8px 12px;
-  border-radius: 4px;
-  transition: background 0.2s;
+  border-radius: 0;
   color: var(--accent);
+  transition: color 0.2s;
 }
-.icon-btn:hover, .accent:hover { background: rgba(142, 68, 173, 0.1); }
-.accent { font-weight: 500; }
+.accent:hover { color: #5e2b8a; }
 
-/* List – Simple, date-focused previews */
+/* List – iA's simple file previews */
 #listView { margin-bottom: 40px; }
 .streak {
   font-size: 16px;
   color: var(--accent);
   margin-bottom: 20px;
-  font-weight: normal;
 }
 #entriesList { list-style: none; }
 #entriesList li {
   padding: 20px 0;
   cursor: pointer;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border);
   transition: background 0.2s;
 }
 #entriesList li:hover { background: rgba(0,0,0,0.02); }
@@ -73,28 +71,28 @@ body {
   font-size: 14px;
   color: #666;
   margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
-/* Editor – Core iA: Full-width, no borders, focus line */
-#editorView { position: relative; }
+/* Editor – iA's core: Transparent, focus underline */
+#editorView { position: relative; height: 60vh; }
 #editor {
   width: 100%;
-  min-height: 60vh;
+  height: 100%;
   padding: 0;
   font-family: var(--mono);
-  font-size: 18px; /* Larger for flow */
+  font-size: 18px;
   line-height: var(--line-height);
   background: transparent;
   border: none;
   outline: none;
   resize: none;
   color: var(--text);
-  display: block;
 }
 
-/* Focus line – iA's signature: Underlines current line */
+/* iA Focus Line – Underlines current cursor line */
+#editor:focus {
+  caret-color: var(--accent);
+}
 #editor::after {
   content: '';
   position: absolute;
@@ -102,35 +100,33 @@ body {
   right: 0;
   bottom: 0;
   height: 1px;
-  background: var(--focus-line);
-  transition: all 0.1s ease;
+  background: var(--border);
 }
 
-/* Prompts – Subtle, below editor like iA tools */
+/* Prompts – iA's subtle tools bar */
 .prompts {
   margin: 30px 0;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 .prompt-btn {
   font-size: 14px;
   background: none;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border);
   color: #666;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.2s;
 }
 .prompt-btn:hover {
-  background: var(--accent);
-  color: white;
   border-color: var(--accent);
+  color: var(--accent);
 }
 
-/* Editor toolbar – Bottom, minimal */
+/* Editor toolbar – iA's bottom controls */
 .editor-toolbar {
   margin-top: 20px;
   display: flex;
@@ -139,20 +135,20 @@ body {
 }
 .editor-toolbar button {
   padding: 8px 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border);
   background: white;
   color: #666;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
   font-family: var(--mono);
 }
 .editor-toolbar .accent {
-  background: var(--accent);
-  color: white;
   border-color: var(--accent);
+  color: var(--accent);
+  background: transparent;
 }
 
-/* Insights – Clean cards, therapist-style explanations */
+/* Insights – iA's clean sections */
 #insightsView h2 {
   margin-bottom: 30px;
   font-size: 24px;
@@ -160,9 +156,8 @@ body {
 }
 #clusters .cluster {
   margin-bottom: 30px;
-  padding: 20px;
-  border-left: 3px solid var(--accent);
-  background: white;
+  padding-left: 20px;
+  border-left: 2px solid var(--accent);
 }
 #clusters h3 { 
   color: var(--accent);
@@ -182,9 +177,9 @@ body {
 #backFromInsights {
   margin-top: 20px;
   padding: 8px 16px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 0;
   cursor: pointer;
 }
