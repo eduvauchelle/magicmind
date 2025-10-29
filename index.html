@@ -1,8 +1,64 @@
-<script>
-  AppleID.auth.init({
-    clientId: 'your.services.id',  // From Apple Developer
-    scope: 'name email',
-    redirectURI: window.location.href,  // For GitHub Pages
-    usePopup: true
-  });
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflect – Simple AI Journal</title>
+
+  <!-- Apple Sign-In SDK -->
+  <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+
+  <!-- CloudKit JS -->
+  <script src="https://cdn.apple-cloudkit.com/ck/5/js/CloudKit.js"></script>
+
+  <!-- CryptoJS (client-side encryption) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- ====================== LOGIN SCREEN ====================== -->
+  <div id="login-screen" class="screen active">
+    <div class="center-box">
+      <h1>Reflect</h1>
+      <p>A private journal for ADHD & depression.</p>
+      <div id="appleid-signin"
+           data-client-id="YOUR_SERVICES_ID"
+           data-scope="name email"
+           data-redirect-uri=""
+           data-use-popup="true"
+           data-color="black"
+           data-border="true"
+           data-type="sign in"></div>
+    </div>
+  </div>
+
+  <!-- ====================== MAIN APP ====================== -->
+  <div id="app-screen" class="screen">
+
+    <!-- Header -->
+    <header>
+      <button id="menu-toggle">☰</button>
+      <h2 id="today-date"></h2>
+      <button id="new-entry">+ New</button>
+    </header>
+
+    <!-- Sidebar (past entries) -->
+    <aside id="sidebar">
+      <h3>Past Entries</h3>
+      <ul id="entry-list"></ul>
+    </aside>
+
+    <!-- Editor -->
+    <main id="editor-container">
+      <div id="prompt" class="prompt"></div>
+      <textarea id="editor" placeholder="Start typing…"></textarea>
+      <div id="word-count">0 words</div>
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
