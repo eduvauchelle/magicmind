@@ -1,8 +1,7 @@
 /* -------------------------------------------------
-   iA Writer – MagicMind (Gradient + White Editor)
+   iA Writer – MagicMind Gradient (PROVEN)
    ------------------------------------------------- */
 
-/* Core colors */
 :root {
   --bg-gradient: linear-gradient(135deg, #6a00f4 0%, #a100ff 25%, #ff00ff 50%, #ff9900 100%);
   --editor-bg: #ffffff;
@@ -12,9 +11,10 @@
   --mono: "iA Writer Mono", "SF Mono", Menlo, Monaco, "Courier New", monospace;
 }
 
-/* Reset & page */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+/* Force full page */
+html, body { height: 100%; margin: 0; padding: 0; }
+
+/* Global */
 body {
   font-family: var(--mono);
   background: var(--bg-gradient);
@@ -24,6 +24,7 @@ body {
   padding: 2rem 1rem;
   max-width: 800px;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 /* Hide views */
@@ -75,7 +76,7 @@ body {
   margin-bottom: .3rem;
 }
 
-/* Editor – white box on gradient */
+/* Editor */
 #editorView { position: relative; }
 #editor {
   width: 100%;
@@ -150,4 +151,4 @@ body {
 #clusters h3 { color: var(--accent); margin-bottom: .5rem; }
 #clusters .entry { margin: .6rem 0 .6rem 1.2rem; color: #444; }
 #clusters p[style*="italic"] { color: #666; font-style: italic; margin-top: .5rem; }
-#backFromInsights { background: #fff; color: #555; }
+#backFromInsights { background: #fff; color: #555; padding: .6rem 1.2rem; border-radius: 20px; }
