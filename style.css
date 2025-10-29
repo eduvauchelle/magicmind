@@ -1,3 +1,99 @@
-body { font-family: 'Iosevka', monospace; font-size: 20px; line-height: 1.5; background: #FAFAFA; color: #222; margin: 0; }
-.editor { width: 100vw; height: 100vh; padding: 4rem; border: none; resize: none; background: white; }
-.focus-mode { position: fixed; top: 0; left: 0; z-index: 10; }  /* Full immersion */
+/* -------------------------------------------------
+   iA Writer inspired minimalism
+   ------------------------------------------------- */
+:root {
+  --bg: #fafafa;
+  --text: #222;
+  --gray: #666;
+  --light-gray: #ddd;
+  --accent: #007aff;   /* Apple blue */
+  --font: 'Iosevka', 'SF Mono', Menlo, Monaco, Consolas, 'Courier New', monospace;
+  --line-height: 1.6;
+  --radius: 8px;
+}
+
+/* Reset */
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; font-family: var(--font); background:var(--bg); color:var(--text); }
+
+/* Screens */
+.screen { display:none; height:100%; }
+.screen.active { display:flex; flex-direction:column; }
+
+/* ---------- Login ---------- */
+#login-screen .center-box {
+  max-width: 320px;
+  margin:auto;
+  text-align:center;
+  padding:2rem;
+}
+#login-screen h1 {
+  font-size:2.2rem;
+  margin-bottom:.5rem;
+}
+#login-screen p {
+  color:var(--gray);
+  margin-bottom:2rem;
+}
+
+/* ---------- Header ---------- */
+header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1rem 1.5rem;
+  border-bottom:1px solid var(--light-gray);
+  background:white;
+}
+header button {
+  background:none; border:none; font-size:1.5rem; cursor:pointer;
+}
+#today-date { font-weight:600; }
+
+/* ---------- Sidebar ---------- */
+aside {
+  position:fixed; left:-300px; top:0; bottom:0; width:280px;
+  background:white; border-right:1px solid var(--light-gray);
+  transition:left .25s ease;
+  overflow-y:auto;
+  padding:1rem;
+}
+aside.open { left:0; }
+#sidebar h3 { margin-bottom:.5rem; font-size:1rem; color:var(--gray); }
+#entry-list { list-style:none; }
+#entry-list li {
+  padding:.6rem 0; border-bottom:1px solid var(--light-gray);
+  cursor:pointer; font-size:.95rem;
+}
+#entry-list li:hover { color:var(--accent); }
+
+/* ---------- Editor ---------- */
+#editor-container {
+  flex:1; display:flex; flex-direction:column;
+  padding:2rem 3rem; max-width:800px; margin:0 auto; width:100%;
+}
+#prompt {
+  color:var(--gray); font-style:italic; margin-bottom:1rem;
+  line-height:var(--line-height);
+}
+#editor {
+  flex:1; border:none; outline:none; resize:none;
+  font-size:1.25rem; line-height:var(--line-height);
+  background:transparent;
+}
+#word-count {
+  align-self:flex-end; color:var(--gray); font-size:.85rem;
+}
+
+/* ---------- Focus mode (full screen) ---------- */
+.focus #editor-container { padding:4rem; }
+.focus header, .focus aside { display:none; }
+
+/* Dark mode (optional toggle later) */
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#1e1e1e; --text:#eee; --gray:#aaa; --light-gray:#333; }
+  body, header, aside, #editor { background:var(--bg); color:var(--text); }
+}
+
+/* Responsive */
+@media (max-width:768px) {
+  #editor-container { padding:1.5rem; }
+}
