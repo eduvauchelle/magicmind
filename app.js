@@ -1,88 +1,76 @@
 /* ==============================
-   1. Apple Sign-In + CloudKit
+   1. APPLE SIGN-IN + CLOUDKIT – COMMENTED OUT
    ============================== */
-const APPLE_CONTAINER = 'iCloud.com.yourdomain.magicmind'; // <-- change to your container
-let ckDatabase, userID;
+// const APPLE_CONTAINER = 'iCloud.com.YOURDOMAIN.magicmind';
+// let ckDatabase, userID;
 
-// Initialise Apple Sign-In
-AppleID.auth.init({
-  clientId: 'com.yourdomain.magicmind.web',   // <-- your Service ID
-  scope: 'name email',
-  redirectURI: location.href,
-  usePopup: true
-});
+// AppleID.auth.init({
+//   clientId: 'com.YOURDOMAIN.magicmind.web',
+//   scope: 'name email',
+//   redirectURI: location.href,
+//   usePopup: true
+// });
 
-document.getElementById('appleid-signin').addEventListener('click', () => AppleID.auth.signIn());
+// document.getElementById('appleid-signin')?.addEventListener('click', () => AppleID.auth.signIn());
 
-// Listen for sign-in result
-document.addEventListener('AppleIDSignInOnSuccess', async (e) => {
-  userID = e.detail.authorization.id_token; // JWT, safe to use as identifier
-  await initCloudKit();
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  await loadEntries();
-});
-document.addEventListener('AppleIDSignInOnFailure', (e) => console.error(e.detail.error));
+// document.addEventListener('AppleIDSignInOnSuccess', async (e) => { … });
+// document.addEventListener('AppleIDSignInOnFailure', (e) => console.error(e.detail.error));
 
-/* ---- CloudKit helper ---- */
-async function initCloudKit() {
-  const container = CloudKit.configure({
-    containers: [{ containerIdentifier: APPLE_CONTAINER }]
-  }).getDefaultContainer();
-  ckDatabase = container.privateCloudDatabase;
-}
+// async function initCloudKit() { … }
 
 /* ==============================
-   2. Data model (JournalEntry)
+   2. LOCAL STORAGE FALLBACK
    ============================== */
-class JournalEntry {
-  constructor({recordName, date, text}) {
-    this.id = recordName;
-    this.date = new Date(date);
-    this.text = text;
+const STORAGE_KEY = 'magicmind-entries';
+let entries = [];
+
+/* Load from localStorage on start */
+function loadFromStorage() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    entries = JSON.parse(raw).map(e => ({
+      id: e.id,
+      date: new Date(e.date),
+      text: e.text
+    }));
   }
-}
-
-/* ==============================
-   3. CRUD with CloudKit
-   ============================== */
-async function loadEntries() {
-  const query = { recordType: 'JournalEntry' };
-  const { records } = await ckDatabase.fetchRecords(query);
-  const entries = records.map(r => new JournalEntry({
-    recordName: r.recordName,
-    date: r.fields.date.value,
-    text: r.fields.text.value
-  }));
   renderList(entries);
   updateStreak(entries);
 }
+loadFromStorage();
 
-async function saveEntry(text) {
-  const record = {
-    recordType: 'JournalEntry',
-    fields: {
-      date: { value: new Date().toISOString() },
-      text: { value: text }
-    }
-  };
-  if (currentEditId) {
-    // edit existing
-    await ckDatabase.saveRecord({ ...record, recordName: currentEditId });
-  } else {
-    await ckDatabase.saveRecord(record);
-  }
-  await loadEntries();
-  switchView('list');
-}
-
-async function deleteEntry(id) {
-  await ckDatabase.deleteRecord({ recordName: id });
-  await loadEntries();
+/* Save to localStorage */
+function saveToStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.map(e => ({
+    id: e.id,
+    date: e.date.toISOString(),
+    text: e.text
+  }))));
 }
 
 /* ==============================
-   4. UI state
+   3. CRUD (localStorage)
+   ============================== */
+async function loadEntries() {
+  // No-op – data already in memory
+}
+
+async function saveEntry(text) {
+  const now = new Date();
+  if (currentEditId) {
+    const idx = entries.findIndex(e => e.id === currentEditId);
+    if (idx > -1) entries[idx].text = text;
+  } else {
+    entries.push({ id: Date.now().toString(), date: now, text });
+  }
+  saveToStorage();
+  renderList(entries);
+  updateStreak(entries);
+  switchView('list');
+}
+
+/* ==============================
+   4. UI (unchanged)
    ============================== */
 let currentEditId = null;
 
@@ -145,21 +133,15 @@ document.querySelectorAll('.prompt-btn').forEach(btn => {
 });
 
 /* ---- Insights (stub) ---- */
-document.getElementById('insightsBtn').onclick = async () => {
-  const { records } = await ckDatabase.fetchRecords({ recordType: 'JournalEntry' });
-  const entries = records.map(r => r.fields.text.value);
-  renderInsights(entries);
+document.getElementById('insightsBtn').onclick = () => {
+  renderInsights(entries.map(e => e.text));
   switchView('insights');
 };
 
 function renderInsights(texts) {
   const container = document.getElementById('clusters');
   container.innerHTML = '';
-  const clusters = {
-    Rumination: [],
-    Progress: [],
-    Overwhelm: []
-  };
+  const clusters = { Rumination: [], Progress: [], Overwhelm: [] };
   texts.forEach(t => {
     const low = t.toLowerCase();
     if (low.includes('stuck') || low.includes('why')) clusters.Rumination.push(t);
@@ -177,7 +159,6 @@ function renderInsights(texts) {
       p.textContent = txt.slice(0,100)+'…';
       sec.appendChild(p);
     });
-    // therapist-style tip
     const tip = document.createElement('p');
     tip.style.fontStyle = 'italic';
     tip.textContent = name === 'Rumination' ? 'Challenge: Is this thought a fact, or just a feeling?'
