@@ -1,27 +1,22 @@
-/* -------------------------------------------------
-   iA Writer – MagicMind Gradient (PROVEN)
-   ------------------------------------------------- */
+/* iA Writer Clone – MagicMind (Minimal, Typewriter Focus) */
 
 :root {
-  --bg-gradient: linear-gradient(135deg, #6a00f4 0%, #a100ff 25%, #ff00ff 50%, #ff9900 100%);
-  --editor-bg: #ffffff;
-  --text: #000000;
-  --accent: #c7a4ff;
-  --shadow: 0 4px 12px rgba(0,0,0,0.15);
-  --mono: "iA Writer Mono", "SF Mono", Menlo, Monaco, "Courier New", monospace;
+  --bg: #f8f8f8;  /* Soft off-white paper */
+  --text: #333333; /* Dark gray for readability */
+  --accent: #8e44ad; /* Subtle purple for buttons */
+  --focus-line: #e0e0e0; /* Subtle underline for current line */
+  --mono: "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace; /* iA fallback */
+  --line-height: 1.8;
 }
 
-/* Force full page */
-html, body { height: 100%; margin: 0; padding: 0; }
-
-/* Global */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: var(--mono);
-  background: var(--bg-gradient);
+  background: var(--bg);
   color: var(--text);
-  line-height: 1.7;
-  font-size: 1.1rem;
-  padding: 2rem 1rem;
+  line-height: var(--line-height);
+  font-size: 16px; /* Base for typewriter feel */
+  padding: 40px 20px;
   max-width: 800px;
   margin: 0 auto;
   min-height: 100vh;
@@ -30,125 +25,166 @@ body {
 /* Hide views */
 .hidden { display: none !important; }
 
-/* Toolbar */
+/* Toolbar – Minimal top bar, like iA */
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 40px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
 }
 .toolbar h1 {
-  font-size: 1.8rem;
+  font-size: 24px;
   font-weight: normal;
-  color: #000;
+  letter-spacing: -0.02em;
 }
 .icon-btn, .accent {
-  background: var(--accent);
+  background: none;
   border: none;
-  font-size: 1.2rem;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  color: #000;
+  font-size: 18px;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .2s;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: var(--accent);
 }
-.icon-btn:hover, .accent:hover { transform: scale(1.05); }
+.icon-btn:hover, .accent:hover { background: rgba(142, 68, 173, 0.1); }
+.accent { font-weight: 500; }
 
-/* List */
-#listView { margin-bottom: 2rem; }
+/* List – Simple, date-focused previews */
+#listView { margin-bottom: 40px; }
 .streak {
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 1rem;
+  font-size: 16px;
+  color: var(--accent);
+  margin-bottom: 20px;
+  font-weight: normal;
 }
 #entriesList { list-style: none; }
 #entriesList li {
-  padding: 1rem 0;
-  color: #000;
-  font-size: 1.1rem;
+  padding: 20px 0;
   cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s;
 }
+#entriesList li:hover { background: rgba(0,0,0,0.02); }
 #entriesList li strong {
   display: block;
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: .3rem;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Editor */
+/* Editor – Core iA: Full-width, no borders, focus line */
 #editorView { position: relative; }
 #editor {
   width: 100%;
-  min-height: 20vh;
-  padding: 1.5rem;
+  min-height: 60vh;
+  padding: 0;
   font-family: var(--mono);
-  font-size: 1.1rem;
-  line-height: 1.8;
-  background: var(--editor-bg);
-  border-radius: 12px;
+  font-size: 18px; /* Larger for flow */
+  line-height: var(--line-height);
+  background: transparent;
   border: none;
   outline: none;
   resize: none;
   color: var(--text);
-  box-shadow: var(--shadow);
+  display: block;
 }
 
-/* Prompts */
+/* Focus line – iA's signature: Underlines current line */
+#editor::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--focus-line);
+  transition: all 0.1s ease;
+}
+
+/* Prompts – Subtle, below editor like iA tools */
 .prompts {
-  margin: 1.5rem 0;
+  margin: 30px 0;
   display: flex;
   flex-wrap: wrap;
-  gap: .6rem;
+  gap: 10px;
+  opacity: 0.7;
 }
 .prompt-btn {
-  font-size: .9rem;
-  background: #fff;
-  border: none;
-  color: #555;
-  padding: .6rem 1.2rem;
-  border-radius: 20px;
+  font-size: 14px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  color: #666;
+  padding: 8px 16px;
+  border-radius: 4px;
   cursor: pointer;
-  box-shadow: var(--shadow);
+  transition: all 0.2s;
 }
 .prompt-btn:hover {
   background: var(--accent);
-  color: #000;
+  color: white;
+  border-color: var(--accent);
 }
 
-/* Editor toolbar */
+/* Editor toolbar – Bottom, minimal */
 .editor-toolbar {
-  margin-top: 1rem;
+  margin-top: 20px;
   display: flex;
-  gap: .8rem;
+  gap: 10px;
+  justify-content: flex-end;
 }
 .editor-toolbar button {
-  padding: .6rem 1.2rem;
-  border-radius: 20px;
-  font-weight: 600;
-  background: #fff;
-  color: #555;
-  box-shadow: var(--shadow);
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  color: #666;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--mono);
 }
 .editor-toolbar .accent {
   background: var(--accent);
-  color: #000;
+  color: white;
+  border-color: var(--accent);
 }
 
-/* Insights */
+/* Insights – Clean cards, therapist-style explanations */
 #insightsView h2 {
-  margin-bottom: 1.5rem;
-  font-size: 1.6rem;
-  color: #000;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: normal;
 }
 #clusters .cluster {
-  margin-bottom: 2rem;
-  background: #fff;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  margin-bottom: 30px;
+  padding: 20px;
+  border-left: 3px solid var(--accent);
+  background: white;
 }
-#clusters h3 { color: var(--accent); margin-bottom: .5rem; }
-#clusters .entry { margin: .6rem 0 .6rem 1.2rem; color: #444; }
-#clusters p[style*="italic"] { color: #666; font-style: italic; margin-top: .5rem; }
-#backFromInsights { background: #fff; color: #555; padding: .6rem 1.2rem; border-radius: 20px; }
+#clusters h3 { 
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+#clusters .entry { 
+  margin: 10px 0 10px 20px;
+  color: #666;
+  font-style: italic;
+}
+#clusters p[style*="italic"] { 
+  color: #999;
+  margin-top: 10px;
+  font-size: 14px;
+}
+#backFromInsights {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
