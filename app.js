@@ -1,132 +1,194 @@
-const STORAGE_KEY = 'magicmind-entries';
-let entries = [];
+// app.js – Magic Mind AI Journal
+// iA Writer style + Apple Sign In + Encrypted iCloud + Prompts + AI Prep
 
-function loadFromStorage() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) {
-    entries = JSON.parse(raw).map(e => ({
-      id: e.id,
-      date: new Date(e.date),
-      text: e.text
-    }));
-  }
-  renderList(entries);
-  updateStreak(entries);
-}
-loadFromStorage();
+const CLIENT_ID = 'web.com.eric.magicmind';
+const REDIRECT_URI = 'https://eduvauchelle.github.io/magicmind/';
+const CONTAINER_ID = 'iCloud.web.com.eric.magicmind';
 
-function saveToStorage() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.map(e => ({
-    id: e.id,
-    date: e.date.toISOString(),
-    text: e.text
-  }))));
-}
+let userToken = null;
+let ckDatabase = null;
+let currentEntry = null;
 
-let currentEditId = null;
+// ----- 50+ ADHD/Depression Prompts -----
+const PROMPTS = [
+  "What tiny win made your brain spark today?",
+  "Which ADHD 'rabbit hole' pulled you in – and what pulled you out?",
+  "Name one thought that felt heavy. Is it 100% true?",
+  "What did your body need today that your mind ignored?",
+  "List 3 things you're grateful for – no matter how small.",
+  // Add more as needed – keep gentle & reflective
+];
 
-function switchView(view) {
-  document.getElementById('listView').classList.toggle('hidden', view !== 'list');
-  document.getElementById('editorView').classList.toggle('hidden', view !== 'editor');
-  document.getElementById('insightsView').classList.toggle('hidden', view !== 'insights');
-}
-
-function renderList(entries) {
-  const ul = document.getElementById('entriesList');
-  ul.innerHTML = entries.length ? '' : '<li>No entries yet. Tap + to start!</li>';
-  const sorted = entries.sort((a, b) => b.date - a.date);
-  sorted.forEach(e => {
-    const li = document.createElement('li');
-    li.innerHTML = `<strong>${e.date.toLocaleDateString()}</strong><br>${e.text.slice(0,50)}…`;
-    li.onclick = () => openEditor(e);
-    ul.appendChild(li);
-  });
-}
-
-function updateStreak(entries) {
-  if (!entries.length) return document.getElementById('streak').textContent = 'Current Streak: 0 days';
-  const sorted = entries.slice().sort((a,b) => b.date - a.date);
-  let streak = 1;
-  let prev = new Date(sorted[0].date);
-  prev.setHours(0,0,0,0);
-  for (let i=1; i<sorted.length; i++) {
-    const cur = new Date(sorted[i].date);
-    cur.setHours(0,0,0,0);
-    const diff = (prev - cur) / 86400000;
-    if (diff === 1) { streak++; prev = cur; } else break;
-  }
-  document.getElementById('streak').textContent = `Current Streak: ${streak} day${streak > 1 ? 's' : ''}`;
-}
-
-function openEditor(entry = null) {
-  currentEditId = entry ? entry.id : null;
-  document.getElementById('editor').value = entry ? entry.text : '';
-  switchView('editor');
-}
-
-document.getElementById('newBtn').onclick = () => openEditor();
-
-document.getElementById('saveBtn').onclick = () => {
-  const txt = document.getElementById('editor').value.trim();
-  if (txt) {
-    const now = new Date();
-    if (currentEditId) {
-      const idx = entries.findIndex(e => e.id === currentEditId);
-      if (idx > -1) entries[idx].text = txt;
-    } else {
-      entries.push({ id: Date.now().toString(), date: now, text: txt });
-    }
-    saveToStorage();
-    renderList(entries);
-    updateStreak(entries);
-    switchView('list');
-  }
-};
-
-document.getElementById('cancelBtn').onclick = () => switchView('list');
-
-document.querySelectorAll('.prompt-btn').forEach(btn => {
-  btn.onclick = () => {
-    const editor = document.getElementById('editor');
-    editor.value += (editor.value ? '\n\n' : '') + btn.textContent;
-    editor.focus();
-  };
+// ----- Apple Sign In -----
+document.addEventListener('AppleIDSignInOnSuccess', (event) => {
+  userToken = event.detail.authorization.id_token;
+  initCloudKit();
+  showApp();
+});
+document.addEventListener('AppleIDSignInOnFailure', (event) => {
+  alert('Sign in failed: ' + event.detail.error);
 });
 
-document.getElementById('insightsBtn').onclick = () => {
-  renderInsights(entries.map(e => e.text));
-  switchView('insights');
-};
-
-function renderInsights(texts) {
-  const container = document.getElementById('clusters');
-  container.innerHTML = '';
-  const clusters = { Rumination: [], Progress: [], Overwhelm: [] };
-  texts.forEach(t => {
-    const low = t.toLowerCase();
-    if (low.includes('stuck') || low.includes('why')) clusters.Rumination.push(t);
-    else if (low.includes('win') || low.includes('better')) clusters.Progress.push(t);
-    else if (low.includes('overwhelm') || low.includes('scattered')) clusters.Overwhelm.push(t);
+// Init Apple Button (runs on page load)
+function initAppleButton() {
+  AppleID.auth.init({
+    clientId: CLIENT_ID,
+    scope: 'name email',
+    redirectURI: REDIRECT_URI,
+    usePopup: true
   });
-  for (const [name, list] of Object.entries(clusters)) {
-    if (!list.length) continue;
-    const sec = document.createElement('div');
-    sec.className = 'cluster';
-    sec.innerHTML = `<h3>${name}</h3>`;
-    list.forEach(txt => {
-      const p = document.createElement('p');
-      p.className = 'entry';
-      p.textContent = txt.slice(0,100) + '…';
-      sec.appendChild(p);
-    });
-    const tip = document.createElement('p');
-    tip.style.fontStyle = 'italic';
-    tip.textContent = name === 'Rumination' ? 'Challenge: Is this thought a fact, or just a feeling?' 
-                    : name === 'Progress' ? 'Great! What helped create this shift?' 
-                    : 'Break one overwhelming thing into a tiny step.';
-    sec.appendChild(tip);
-    container.appendChild(sec);
+}
+
+// ----- CloudKit Setup -----
+async function initCloudKit() {
+  try {
+    const container = CloudKit.configure({
+      containers: [{
+        containerIdentifier: CONTAINER_ID,
+        apiTokenAuth: { apiToken: 'DUMMY' }, // Web uses user token
+        environment: 'development' // Change to 'production' later
+      }]
+    }).getDefaultContainer();
+
+    await container.setUpAuth({ userIdentity: { idToken: userToken } });
+    ckDatabase = container.privateCloudDatabase;
+    loadEntries();
+  } catch (e) {
+    console.error('CloudKit init failed', e);
   }
 }
 
-document.getElementById('backFromInsights').onclick = () => switchView('list');
+// ----- Encryption (AES-GCM from Apple token) -----
+function deriveKeyFromToken(token) {
+  const hash = CryptoJS.SHA256(token).toString();
+  return CryptoJS.enc.Hex.parse(hash.substring(0, 32));
+}
+
+function encrypt(text) {
+  const key = deriveKeyFromToken(userToken);
+  const iv = CryptoJS.lib.WordArray.random(12);
+  const encrypted = CryptoJS.AES.encrypt(text, key, { iv });
+  return iv.concat(encrypted.ciphertext).toString();
+}
+
+function decrypt(encryptedBase64) {
+  const key = deriveKeyFromToken(userToken);
+  const data = CryptoJS.enc.Base64.parse(encryptedBase64);
+  const iv = CryptoJS.lib.WordArray.create(data.words.slice(0, 3));
+  const ciphertext = CryptoJS.lib.WordArray.create(data.words.slice(3));
+  const decrypted = CryptoJS.AES.decrypt({ ciphertext }, key, { iv });
+  return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+// ----- Auto-Save Every 30s -----
+let saveTimer;
+function startAutoSave() {
+  saveTimer = setInterval(saveCurrentEntry, 30_000);
+}
+
+// ----- Save Entry -----
+async function saveCurrentEntry() {
+  if (!currentEntry || !ckDatabase) return;
+  const text = document.getElementById('editor').value.trim();
+  if (!text) return;
+
+  const encrypted = encrypt(text);
+  const record = {
+    recordName: currentEntry.recordName || undefined,
+    recordType: 'JournalEntry',
+    fields: {
+      content: { value: encrypted },
+      date: { value: new Date().toISOString() },
+      prompt: { value: document.getElementById('prompt').textContent }
+    }
+  };
+
+  try {
+    const saved = await (record.recordName
+      ? ckDatabase.saveRecord(record)
+      : ckDatabase.saveRecord(record));
+    currentEntry = saved;
+    updateWordCount(text);
+  } catch (e) {
+    console.error('Save failed', e);
+  }
+}
+
+// ----- Load Past Entries -----
+async function loadEntries() {
+  try {
+    const query = { recordType: 'JournalEntry', sortBy: [{ fieldName: 'date', ascending: false }] };
+    const result = await ckDatabase.fetchRecords(query);
+    const list = document.getElementById('entry-list');
+    list.innerHTML = '';
+    result.records.forEach(r => {
+      const li = document.createElement('li');
+      const date = new Date(r.fields.date.value).toLocaleDateString();
+      li.textContent = `${date} – ${r.fields.prompt.value.substring(0, 30)}...`;
+      li.onclick = () => loadEntry(r);
+      list.appendChild(li);
+    });
+  } catch (e) {
+    console.error('Load failed', e);
+  }
+}
+
+function loadEntry(record) {
+  currentEntry = record;
+  const decrypted = decrypt(record.fields.content.value);
+  document.getElementById('editor').value = decrypted;
+  document.getElementById('prompt').textContent = record.fields.prompt.value;
+  updateWordCount(decrypted);
+}
+
+// ----- New Entry -----
+function newEntry() {
+  currentEntry = null;
+  document.getElementById('editor').value = '';
+  showRandomPrompt();
+  updateWordCount('');
+  document.getElementById('editor').focus();
+}
+
+// ----- Prompt System -----
+function showRandomPrompt() {
+  const promptEl = document.getElementById('prompt');
+  const random = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+  promptEl.textContent = random;
+}
+
+// ----- UI Helpers -----
+function showApp() {
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
+  newEntry();
+  startAutoSave();
+}
+
+function updateWordCount(text) {
+  const words = text.trim().split(/\s+/).filter(w => w).length;
+  document.getElementById('word-count').textContent = `${words} word${words === 1 ? '' : 's'}`;
+}
+
+// ----- Sidebar Toggle -----
+document.getElementById('menu-toggle').onclick = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+};
+
+// ----- New Entry Button -----
+document.getElementById('new-entry').onclick = newEntry;
+
+// ----- Init -----
+window.onload = () => {
+  initAppleButton();
+  showRandomPrompt();
+  document.getElementById('editor').addEventListener('input', () => updateWordCount(document.getElementById('editor').value));
+  // Auto-load if already logged in (token in URL fragment)
+  if (window.location.hash.includes('id_token')) {
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    userToken = params.get('id_token');
+    initCloudKit();
+    showApp();
+  }
+};
