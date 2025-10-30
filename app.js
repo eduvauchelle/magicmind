@@ -42,13 +42,13 @@ function initAppleButton() {
 // ----- CloudKit Setup -----
 async function initCloudKit() {
   try {
-    const container = CloudKit.configure({
-      containers: [{
-        containerIdentifier: CONTAINER_ID,
-        apiTokenAuth: { apiToken: 'DUMMY' }, // Web uses user token
-        environment: 'production'
-      }]
-    }).getDefaultContainer();
+const container = CloudKit.configure({
+  containers: [{
+    containerIdentifier: CONTAINER_ID,
+    apiTokenAuth: { apiToken: 'DUMMY' },
+    environment: 'production'  // ← THIS LINE
+  }]
+}).getDefaultContainer();
 
     await container.setUpAuth({ userIdentity: { idToken: userToken } });
     ckDatabase = container.privateCloudDatabase;
