@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reflect – Simple AI Journal</title>
+  <title>Magic Mind – AI Journal</title>
 
   <!-- Apple Sign-In SDK -->
   <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
@@ -21,10 +21,10 @@
   <!-- ====================== LOGIN SCREEN ====================== -->
   <div id="login-screen" class="screen active">
     <div class="center-box">
-      <h1>Reflect</h1>
-      <p>A private journal for ADHD & depression.</p>
+      <h1>Magic Mind</h1>
+      <p>A private AI journal for ADHD & depression.</p>
       <div id="appleid-signin"
-           data-client-id="YOUR_SERVICES_ID"
+           data-client-id="com.yourname.magicmind.web"
            data-scope="name email"
            data-redirect-uri=""
            data-use-popup="true"
@@ -53,7 +53,7 @@
     <!-- Editor -->
     <main id="editor-container">
       <div id="prompt" class="prompt"></div>
-      <textarea id="editor" placeholder="Start typing…"></textarea>
+      <textarea id="editor" placeholder="What’s on your mind?"></textarea>
       <div id="word-count">0 words</div>
     </main>
 
