@@ -1,7 +1,7 @@
 // app.js – Magic Mind AI Journal
 // iA Writer style + Apple Sign In + Encrypted iCloud + Prompts + AI Prep
 
-const CLIENT_ID = 'web.com.eric.magicmind';
+const CLIENT_ID = 'com.eric.magicmind.web';  // ← APP ID (primary)
 const REDIRECT_URI = 'https://eduvauchelle.github.io/magicmind/';
 const CONTAINER_ID = 'iCloud.web.com.eric.magicmind';
 
@@ -157,7 +157,7 @@ async function saveCurrentEntry() {
   };
 
   try {
-    const saved = await ckDatabase.saveRecord(record);  // ← FIXED
+    const saved = await ckDatabase.saveRecord(record);
     currentEntry = saved;
     updateWordCount(text);
   } catch (e) {
@@ -173,7 +173,7 @@ async function loadEntries() {
       recordType: 'JournalEntry',
       sortBy: [{ fieldName: 'date', ascending: false }]
     };
-    const result = await ckDatabase.queryRecords(query);  // ← FIXED
+    const result = await ckDatabase.queryRecords(query);
     const list = document.getElementById('entry-list');
     list.innerHTML = '';
     result.records.forEach(r => {
@@ -241,16 +241,14 @@ window.addEventListener('load', () => {
   initAppleButton();
   showRandomPrompt();
 
-  // Real-time word count
   document.getElementById('editor')?.addEventListener('input', () => {
     updateWordCount(document.getElementById('editor').value);
   });
 
-  // Handle redirect after login
   if (window.location.hash.includes('id_token')) {
     const params = new URLSearchParams(window.location.hash.substring(1));
     userToken = params.get('id_token');
-    window.location.hash = ''; // Clean URL
+    window.location.hash = '';
     initCloudKit();
     showApp();
   }
