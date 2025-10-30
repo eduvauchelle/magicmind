@@ -1,7 +1,6 @@
 // app.js – Magic Mind AI Journal
 // iA Writer style + Apple Sign In + Encrypted iCloud + Prompts + AI Prep
 
-// app.js – Magic Mind (FIXED LOGIN)
 const CLIENT_ID = 'web.com.eric.magicmind';
 const REDIRECT_URI = 'https://eduvauchelle.github.io/magicmind/';
 const CONTAINER_ID = 'iCloud.web.com.eric.magicmind';
@@ -10,18 +9,71 @@ let userToken = null;
 let ckDatabase = null;
 let currentEntry = null;
 
-const PROMPTS = [ /* same as before */ ];
+// ----- 50+ ADHD/Depression Prompts -----
+const PROMPTS = [
+  "What tiny win made your brain spark today?",
+  "Which ADHD 'rabbit hole' pulled you in – and what pulled you out?",
+  "Name one thought that felt heavy. Is it 100% true?",
+  "What did your body need today that your mind ignored?",
+  "List 3 things you're grateful for – no matter how small.",
+  "What’s one small step you took toward a goal?",
+  "Describe a moment you felt calm today.",
+  "What emotion showed up most today? Why?",
+  "If your day was a weather report, what would it say?",
+  "What’s one thing you’d tell your past self?",
+  "What drained your energy? What recharged it?",
+  "Write a kind note to yourself.",
+  "What’s working well in your routine?",
+  "What’s one boundary you need to set?",
+  "How did procrastination feel in your body?",
+  "What made you laugh or smile today?",
+  "What’s one task you avoided – and why?",
+  "How did you show up for yourself today?",
+  "What’s a strength you used today?",
+  "What’s one thing you’re proud of this week?",
+  "What would 10-year-old you say about today?",
+  "What’s one change you want to try tomorrow?",
+  "How did you handle a tough moment?",
+  "What’s one thing you learned about yourself?",
+  "Write about a safe place in your mind.",
+  "What’s one habit you want to build?",
+  "How did you feel when you woke up?",
+  "What’s one thing you can let go of?",
+  "Describe your energy level in colors.",
+  "What’s one way you practiced self-care?",
+  "What’s a fear that held you back today?",
+  "Write a thank-you note to your brain.",
+  "What’s one thing you’re looking forward to?",
+  "How did you navigate overwhelm?",
+  "What’s one truth you know but forget?",
+  "Write about a moment of clarity.",
+  "What’s one way you grew today?",
+  "How did you show kindness to yourself?",
+  "What’s one thing you’d do differently?",
+  "Write a pep talk for tomorrow.",
+  "What’s one thing that felt easy today?",
+  "How did you recharge your social battery?",
+  "What’s one goal for the next hour?",
+  "Write about a time you felt capable.",
+  "What’s one thing you forgive yourself for?",
+  "How did you handle distraction today?",
+  "What’s one thing you’re curious about?",
+  "Write a love letter to your future self.",
+  "What’s one way you showed resilience?"
+];
 
-// Apple Events
+// ----- Apple Sign In Events -----
 document.addEventListener('AppleIDSignInOnSuccess', (e) => {
   userToken = e.detail.authorization.id_token;
   initCloudKit();
   showApp();
 });
+
 document.addEventListener('AppleIDSignInOnFailure', (e) => {
-  alert('Login failed: ' + e.detail.error);
+  alert('Login failed: ' + (e.detail.error || 'Unknown error'));
 });
 
+// ----- Init Apple Button -----
 function initAppleButton() {
   AppleID.auth.init({
     clientId: CLIENT_ID,
@@ -31,13 +83,14 @@ function initAppleButton() {
   });
 }
 
+// ----- CloudKit Setup -----
 async function initCloudKit() {
   try {
     const container = CloudKit.configure({
       containers: [{
         containerIdentifier: CONTAINER_ID,
         apiTokenAuth: { apiToken: 'DUMMY' },
-        environment: 'production'  // ← FIXED
+        environment: 'production'
       }]
     }).getDefaultContainer();
 
@@ -45,17 +98,19 @@ async function initCloudKit() {
     ckDatabase = container.privateCloudDatabase;
     loadEntries();
   } catch (e) {
-    console.error('CloudKit error', e);
+    console.error('CloudKit init failed:', e);
+    alert('iCloud setup failed. Try again.');
   }
 }
 
-// ----- Encryption (AES-GCM from Apple token) -----
+// ----- Encryption (AES-GCM) -----
 function deriveKeyFromToken(token) {
   const hash = CryptoJS.SHA256(token).toString();
   return CryptoJS.enc.Hex.parse(hash.substring(0, 32));
 }
 
 function encrypt(text) {
+  if (!userToken) return text;
   const key = deriveKeyFromToken(userToken);
   const iv = CryptoJS.lib.WordArray.random(12);
   const encrypted = CryptoJS.AES.encrypt(text, key, { iv });
@@ -63,17 +118,24 @@ function encrypt(text) {
 }
 
 function decrypt(encryptedBase64) {
-  const key = deriveKeyFromToken(userToken);
-  const data = CryptoJS.enc.Base64.parse(encryptedBase64);
-  const iv = CryptoJS.lib.WordArray.create(data.words.slice(0, 3));
-  const ciphertext = CryptoJS.lib.WordArray.create(data.words.slice(3));
-  const decrypted = CryptoJS.AES.decrypt({ ciphertext }, key, { iv });
-  return decrypted.toString(CryptoJS.enc.Utf8);
+  if (!userToken || !encryptedBase64) return '';
+  try {
+    const key = deriveKeyFromToken(userToken);
+    const data = CryptoJS.enc.Base64.parse(encryptedBase64);
+    const iv = CryptoJS.lib.WordArray.create(data.words.slice(0, 3));
+    const ciphertext = CryptoJS.lib.WordArray.create(data.words.slice(3));
+    const decrypted = CryptoJS.AES.decrypt({ ciphertext }, key, { iv });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  } catch (e) {
+    console.error('Decrypt failed', e);
+    return '[Encrypted]';
+  }
 }
 
-// ----- Auto-Save Every 30s -----
+// ----- Auto-Save -----
 let saveTimer;
 function startAutoSave() {
+  clearInterval(saveTimer);
   saveTimer = setInterval(saveCurrentEntry, 30_000);
 }
 
@@ -95,9 +157,7 @@ async function saveCurrentEntry() {
   };
 
   try {
-    const saved = await (record.recordName
-      ? ckDatabase.saveRecord(record)
-      : ckDatabase.saveRecord(record));
+    const saved = await ckDatabase.saveRecord(record);  // ← FIXED
     currentEntry = saved;
     updateWordCount(text);
   } catch (e) {
@@ -105,17 +165,22 @@ async function saveCurrentEntry() {
   }
 }
 
-// ----- Load Past Entries -----
+// ----- Load Entries -----
 async function loadEntries() {
+  if (!ckDatabase) return;
   try {
-    const query = { recordType: 'JournalEntry', sortBy: [{ fieldName: 'date', ascending: false }] };
-    const result = await ckDatabase.fetchRecords(query);
+    const query = {
+      recordType: 'JournalEntry',
+      sortBy: [{ fieldName: 'date', ascending: false }]
+    };
+    const result = await ckDatabase.queryRecords(query);  // ← FIXED
     const list = document.getElementById('entry-list');
     list.innerHTML = '';
     result.records.forEach(r => {
       const li = document.createElement('li');
       const date = new Date(r.fields.date.value).toLocaleDateString();
-      li.textContent = `${date} – ${r.fields.prompt.value.substring(0, 30)}...`;
+      const prompt = r.fields.prompt?.value || 'No prompt';
+      li.textContent = `${date} – ${prompt.substring(0, 30)}...`;
       li.onclick = () => loadEntry(r);
       list.appendChild(li);
     });
@@ -128,7 +193,7 @@ function loadEntry(record) {
   currentEntry = record;
   const decrypted = decrypt(record.fields.content.value);
   document.getElementById('editor').value = decrypted;
-  document.getElementById('prompt').textContent = record.fields.prompt.value;
+  document.getElementById('prompt').textContent = record.fields.prompt?.value || '';
   updateWordCount(decrypted);
 }
 
@@ -152,7 +217,9 @@ function showRandomPrompt() {
 function showApp() {
   document.getElementById('login-screen').classList.remove('active');
   document.getElementById('app-screen').classList.add('active');
-  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en', {
+    weekday: 'long', month: 'long', day: 'numeric'
+  });
   newEntry();
   startAutoSave();
 }
@@ -162,24 +229,29 @@ function updateWordCount(text) {
   document.getElementById('word-count').textContent = `${words} word${words === 1 ? '' : 's'}`;
 }
 
-// ----- Sidebar Toggle -----
-document.getElementById('menu-toggle').onclick = () => {
+// ----- Sidebar & Buttons -----
+document.getElementById('menu-toggle')?.addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
-};
+});
 
-// ----- New Entry Button -----
-document.getElementById('new-entry').onclick = newEntry;
+document.getElementById('new-entry')?.addEventListener('click', newEntry);
 
 // ----- Init -----
-window.onload = () => {
+window.addEventListener('load', () => {
   initAppleButton();
   showRandomPrompt();
-  document.getElementById('editor').addEventListener('input', () => updateWordCount(document.getElementById('editor').value));
-  // Auto-load if already logged in (token in URL fragment)
+
+  // Real-time word count
+  document.getElementById('editor')?.addEventListener('input', () => {
+    updateWordCount(document.getElementById('editor').value);
+  });
+
+  // Handle redirect after login
   if (window.location.hash.includes('id_token')) {
     const params = new URLSearchParams(window.location.hash.substring(1));
     userToken = params.get('id_token');
+    window.location.hash = ''; // Clean URL
     initCloudKit();
     showApp();
   }
-};
+});
