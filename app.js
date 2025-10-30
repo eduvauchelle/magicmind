@@ -46,7 +46,7 @@ async function initCloudKit() {
       containers: [{
         containerIdentifier: CONTAINER_ID,
         apiTokenAuth: { apiToken: 'DUMMY' }, // Web uses user token
-        environment: 'development' // Change to 'production' later
+        environment: 'production'
       }]
     }).getDefaultContainer();
 
