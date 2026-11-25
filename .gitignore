@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+.venv/
+venv/
+__pycache__/
+dist/
+build/
+.next/
+DerivedData/
+*.xcuserstate
